@@ -126,5 +126,4 @@ public class IBANChecker {
     private static String rearrangeIban(String iban) {
         return iban.substring(4) + iban.substring(0, 4);
     }
-
 }
