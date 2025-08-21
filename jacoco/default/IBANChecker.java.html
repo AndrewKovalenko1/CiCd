@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IBANChecker.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CiCd</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">IBANChecker.java</span></div><h1>IBANChecker.java</h1><pre class="source lang-java linenums">import java.util.HashMap;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Diese Klasse dient zur Überprüfung von IBANs.
+ * Sie enthält Methoden, um Länge, Struktur und Prüfsumme einer IBAN zu validieren.
+ */
+<span class="nc" id="L10">public class IBANChecker {</span>
+
+    /** Enthält die erwarteten IBAN-Längen pro Land (Schlüssel = Ländercode). */
+<span class="fc" id="L13">    private static final Map&lt;String, Integer&gt; chars = new HashMap&lt;&gt;();</span>
+    static {
+<span class="fc" id="L15">        chars.put(&quot;AT&quot;, 20);</span>
+<span class="fc" id="L16">        chars.put(&quot;BE&quot;, 16);</span>
+<span class="fc" id="L17">        chars.put(&quot;CZ&quot;, 24);</span>
+<span class="fc" id="L18">        chars.put(&quot;DE&quot;, 22);</span>
+<span class="fc" id="L19">        chars.put(&quot;DK&quot;, 18);</span>
+<span class="fc" id="L20">        chars.put(&quot;FR&quot;, 27);</span>
+<span class="fc" id="L21">    }</span>
+
+    /**
+     * Startmethode des Programms.
+     *
+     * @param args Kommandozeilenargumente (werden hier nicht benutzt)
+     */
+    public static void main(String[] args) {
+<span class="nc" id="L29">        String iban = &quot;DE227902007600279131&quot;;</span>
+<span class="nc" id="L30">        System.out.println(&quot;Welcome to the IBAN Checker!&quot;);</span>
+<span class="nc" id="L31">        System.out.println(&quot;IBAN &quot; + iban + &quot; is &quot; + validate(iban));</span>
+<span class="nc" id="L32">    }</span>
+
+    /**
+     * Validiert eine gegebene IBAN anhand von Länge, Ländercode und Prüfziffer.
+     *
+     * @param iban IBAN, die überprüft werden soll
+     * @return true, wenn die IBAN gültig ist, sonst false
+     */
+    public static boolean validate(String iban) {
+<span class="fc bfc" id="L41" title="All 2 branches covered.">        if (!checkLength(iban)) {</span>
+<span class="fc" id="L42">            return false;</span>
+        }
+<span class="fc" id="L44">        String rearrangedIban = rearrangeIban(iban);</span>
+<span class="fc" id="L45">        String convertedIban = convertToInteger(rearrangedIban);</span>
+<span class="fc" id="L46">        List&lt;String&gt; segments = createSegments(convertedIban);</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        return calculate(segments) == 1;</span>
+    }
+
+    /**
+     * Führt die Modulo-97-Prüfung auf den Segmenten der IBAN aus.
+     *
+     * @param segments Liste von Zahlen-Strings
+     * @return Ergebnis der Berechnung (sollte 1 sein bei gültiger IBAN)
+     */
+    private static int calculate(List&lt;String&gt; segments) {
+<span class="fc" id="L57">        long n = 0;</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">        for (String segment : segments) {</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">            if (segment.length() == 9) {</span>
+<span class="fc" id="L60">                n = Long.parseLong(segment) % 97;</span>
+            } else {
+<span class="fc" id="L62">                segment = n + segment;</span>
+<span class="fc" id="L63">                n = Long.parseLong(segment) % 97;</span>
+            }
+<span class="fc" id="L65">        }</span>
+<span class="fc" id="L66">        return (int) n;</span>
+    }
+
+    /**
+     * Überprüft, ob die Länge der IBAN zum angegebenen Land passt.
+     *
+     * @param iban IBAN-String
+     * @return true, wenn Länge korrekt ist, sonst false
+     */
+    private static boolean checkLength(String iban) {
+<span class="fc" id="L76">        String countryCode = iban.substring(0, 2);</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        return chars.containsKey(countryCode) &amp;&amp; chars.get(countryCode) ==</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">                iban.length();</span>
+    }
+
+    /**
+     * Konvertiert eine IBAN in eine reine Zahlendarstellung (Buchstaben → Zahlen).
+     *
+     * @param iban IBAN-String
+     * @return konvertierte IBAN als Zahl-String
+     */
+    private static String convertToInteger(String iban) {
+<span class="fc" id="L88">        StringBuilder convertedIban = new StringBuilder();</span>
+<span class="fc" id="L89">        String upperIban = iban.toUpperCase();</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        for (char c : upperIban.toCharArray()) {</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">            if (Character.isDigit(c)) {</span>
+<span class="fc" id="L92">                convertedIban.append(c);</span>
+            }
+<span class="fc bfc" id="L94" title="All 2 branches covered.">            if (Character.isLetter(c)) {</span>
+<span class="fc" id="L95">                convertedIban.append(c - 55);</span>
+            }
+        }
+<span class="fc" id="L98">        return convertedIban.toString();</span>
+    }
+
+    /**
+     * Zerlegt die IBAN in Segmente für die Berechnung.
+     *
+     * @param iban konvertierte IBAN
+     * @return Liste von Segmenten
+     */
+    private static List&lt;String&gt; createSegments(String iban) {
+<span class="fc" id="L108">        List&lt;String&gt; segments = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L109">        String remainingIban = iban;</span>
+<span class="fc" id="L110">        segments.add(remainingIban.substring(0, 9));</span>
+<span class="fc" id="L111">        remainingIban = remainingIban.substring(9);</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">        while (remainingIban.length() &gt;= 9) {</span>
+<span class="fc" id="L113">            segments.add(remainingIban.substring(0, 7));</span>
+<span class="fc" id="L114">            remainingIban = remainingIban.substring(7);</span>
+        }
+<span class="fc" id="L116">        segments.add(remainingIban);</span>
+<span class="fc" id="L117">        return segments;</span>
+    }
+
+    /**
+     * Verschiebt die ersten vier Zeichen (Ländercode + Prüfziffer) ans Ende der IBAN.
+     *
+     * @param iban IBAN-String
+     * @return umgestellte IBAN
+     */
+    private static String rearrangeIban(String iban) {
+<span class="fc" id="L127">        return iban.substring(4) + iban.substring(0, 4);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
