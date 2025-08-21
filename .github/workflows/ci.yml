@@ -28,6 +28,12 @@ jobs:
     - name: Generate reports
       run: mvn site
 
+    - name: Deploy full site to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./target/site
+
     - name: Upload JAR
       uses: actions/upload-artifact@v4
       with:
