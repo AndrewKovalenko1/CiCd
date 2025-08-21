@@ -29,25 +29,25 @@ jobs:
       run: mvn site
 
     - name: Upload JAR
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: app-jar
         path: target/*.jar
 
     - name: Upload Javadoc
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: javadoc
         path: target/site/apidocs/
 
     - name: Upload JaCoCo Report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: jacoco-report
         path: target/site/jacoco/
 
     - name: Upload SpotBugs Report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: spotbugs-report
         path: target/site/spotbugs.html
